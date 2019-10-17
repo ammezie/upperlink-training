@@ -2,6 +2,7 @@
 
 const { validateAll } = use("Validator");
 const User = use("App/Models/User");
+const Hash = use("Hash");
 
 class UserController {
   showRegister({ view }) {
@@ -39,6 +40,51 @@ class UserController {
     // await user.save();
 
     return response.redirect("/");
+  }
+
+  showLogin({ view }) {
+    return view.render("users.login");
+  }
+
+  async login({ request, session, response, auth }) {
+    // try {
+    //   await auth.attempt(request.input("email"), request.input("password"));
+
+    //   return response.redirect("/");
+    // } catch (err) {
+    //   session.flash({ alert: "Invalid email/password" });
+
+    //   return response.redirect("back");
+    // }
+
+    try {
+      const user = await User.query()
+        .where("email", request.input("email_or_username"))
+        .orWhere("username", request.input("email_or_username"))
+        .firstOrFail();
+
+      const passwordVerified = await Hash.verify(
+        request.input("password"),
+        user.password
+      );
+
+      if (!passwordVerified) {
+        session.flash({ alert: "Invalid password" });
+
+        return response.redirect("back");
+      }
+
+      // await auth.logout();
+
+      // await auth.login(user);
+      // await auth.loginViaId(user.id);
+
+      return response.redirect("/");
+    } catch (error) {
+      session.flash({ alert: "Invalid email/username" });
+
+      return response.redirect("back");
+    }
   }
 }
 
