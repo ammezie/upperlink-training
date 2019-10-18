@@ -1,4 +1,7 @@
-'use strict'
+"use strict";
+
+const Post = use("App/Models/Post");
+const Category = use("App/Models/Category");
 
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
@@ -17,7 +20,12 @@ class PostController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async index ({ request, response, view }) {
+  async index({ request, response, view }) {
+    const posts = await Post.all();
+
+    return view.render("posts.index", {
+      posts: posts.toJSON(),
+    });
   }
 
   /**
@@ -29,7 +37,12 @@ class PostController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async create ({ request, response, view }) {
+  async create({ request, response, view }) {
+    const categories = await Category.all();
+
+    return view.render("posts.create", {
+      categories: categories.toJSON(),
+    });
   }
 
   /**
@@ -40,7 +53,23 @@ class PostController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async store ({ request, response }) {
+  async store({ request, response }) {
+    // const post = await Post.create({
+    //   title: request.input('title'),
+    //   context: request.input('context')
+    // })
+
+    const post = new Post();
+
+    post.title = request.input("title");
+    post.context = request.input("context");
+
+    await post.save();
+
+    // attach()
+    await post.categories().attach(request.input("category_ids"));
+
+    return response.route("posts.index");
   }
 
   /**
@@ -52,8 +81,7 @@ class PostController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async show ({ params, request, response, view }) {
-  }
+  async show({ params, request, response, view }) {}
 
   /**
    * Render a form to update an existing post.
@@ -64,8 +92,7 @@ class PostController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async edit ({ params, request, response, view }) {
-  }
+  async edit({ params, request, response, view }) {}
 
   /**
    * Update post details.
@@ -75,8 +102,7 @@ class PostController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async update ({ params, request, response }) {
-  }
+  async update({ params, request, response }) {}
 
   /**
    * Delete a post with id.
@@ -86,8 +112,7 @@ class PostController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async destroy ({ params, request, response }) {
-  }
+  async destroy({ params, request, response }) {}
 }
 
-module.exports = PostController
+module.exports = PostController;

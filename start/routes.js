@@ -22,3 +22,9 @@ Route.get("/register", "UserController.showRegister");
 Route.post("/register", "UserController.register").as("register");
 Route.get("/login", "UserController.showLogin");
 Route.post("/login", "UserController.login").as("login");
+
+Route.get("/posts", "PostController.index").as("posts.index");
+Route.get("posts/create", "PostController.create");
+Route.post("posts", "PostController.store")
+  .as("posts.store")
+  .validator("StorePost");
