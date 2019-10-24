@@ -2,6 +2,7 @@
 
 const Post = use("App/Models/Post");
 const Category = use("App/Models/Category");
+const Ws = use("Ws");
 
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
@@ -68,6 +69,10 @@ class PostController {
 
     // attach()
     await post.categories().attach(request.input("category_ids"));
+
+    // Ws.getChannel("post")
+    //   .topic("post")
+    //   .broadcast("postCreated", post);
 
     return response.route("posts.index");
   }
